@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI Quiz Battle</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#050817;color:#fff;font-family:Arial,sans-serif}
+.app{max-width:430px;min-height:100vh;margin:auto;padding:18px;background:radial-gradient(circle at 50% 10%,#16245a 0,#080b20 42%,#03050e 100%)}
+.top{display:flex;justify-content:space-between;align-items:center}.coins{font-size:18px;font-weight:700}
+.badge{background:#111a38;border:1px solid #394a85;padding:9px 14px;border-radius:20px}
+h1{font-size:42px;text-align:center;margin:45px 0 5px;background:linear-gradient(90deg,#8d5cff,#22d9ff);color:transparent;background-clip:text}
+.sub{text-align:center;color:#b7c1e5}.robot{font-size:100px;text-align:center;margin:25px 0}
+button{width:100%;border:0;border-radius:16px;padding:16px;margin:8px 0;font-size:18px;font-weight:700;color:#fff;background:#18234b;border:1px solid #41529a}
+.primary{background:linear-gradient(90deg,#ffb900,#ff7b00);color:#17100a}.purple{background:linear-gradient(90deg,#6b21d9,#a855f7)}
+.screen{display:none}.screen.active{display:block}.question{font-size:24px;line-height:1.25;background:#0d1530;padding:22px;border-radius:18px;border:1px solid #344475;margin:25px 0}
+.option{text-align:left}.correct{background:#16833d!important}.wrong{background:#a52a3a!important}
+.bar{height:8px;background:#1a2547;border-radius:10px;overflow:hidden}.fill{height:100%;background:#7c4dff;width:0}
+.small{color:#aeb9dc;font-size:14px}.row{display:flex;justify-content:space-between;gap:10px}.stat{flex:1;background:#0d1530;padding:14px;border-radius:14px;text-align:center}
+.result{text-align:center;margin-top:70px}.result .big{font-size:70px}
+</style>
+</head>
+<body>
+<div class="app">
+  <div id="home" class="screen active">
+    <div class="top"><div class="coins">🪙 <span id="coins">0</span></div><div class="badge">⚙️</div></div>
+    <h1>AI QUIZ<br>BATTLE</h1><div class="sub">Challenge your brain!</div>
+    <div class="robot">🤖</div>
+    <button class="primary" onclick="startGame()">▶ PLAY</button>
+    <button class="purple" onclick="show('levels')">▥ SELECT LEVEL</button>
+    <button onclick="show('leader')">🏆 LEADERBOARD</button>
+  </div>
+
+  <div id="levels" class="screen">
+    <button onclick="show('home')">← Back</button><h2>Select Level</h2>
+    <button onclick="startGame()">🟢 Level 1 — Easy</button>
+    <button disabled>🔒 Level 2 — Easy</button>
+    <button disabled>🔒 Level 3 — Medium</button>
+    <button disabled>🔒 Level 4 — Hard</button>
+  </div>
+
+  <div id="game" class="screen">
+    <div class="top"><button style="width:auto;padding:10px 14px" onclick="show('home')">←</button><div class="badge">Question <span id="qnum">1</span>/5</div><div>⏱️ <span id="time">15</span></div></div>
+    <div style="margin:15px 0" class="bar"><div id="fill" class="fill"></div></div>
+    <div class="row"><div class="stat">⭐ <span id="score">0</span><br><span class="small">Score</span></div><div class="stat">❤️ <span id="lives">3</span><br><span class="small">Lives</span></div></div>
+    <div id="question" class="question"></div>
+    <div id="options"></div>
+    <button onclick="hint()">🤖 Ask AI Hint</button>
+  </div>
+
+  <div id="result" class="screen result">
+    <div class="big">🎉</div><h1>GAME OVER</h1>
+    <h2>Score: <span id="finalScore">0</span></h2>
+    <p>You earned 🪙 <span id="earned">0</span></p>
+    <button class="primary" onclick="startGame()">PLAY AGAIN</button>
+    <button onclick="show('home')">HOME</button>
+  </div>
+
+  <div id="leader" class="screen">
+    <button onclick="show('home')">← Back</button><h2>🏆 Leaderboard</h2>
+    <button>🥇 BrainMaster — 9820</button><button>🥈 QuizWhiz — 8750</button><button>🥉 AI_Genius — 7650</button>
+    <button>⭐ You — <span id="lbscore">0</span></button>
+  </div>
+</div>
+<script>
+const qs=[
+ {q:"Which planet is known as the Red Planet?",o:["Earth","Mars","Jupiter","Venus"],a:1},
+ {q:"How many days are there in a week?",o:["5","6","7","8"],a:2},
+ {q:"Which is the largest ocean?",o:["Atlantic","Indian","Pacific","Arctic"],a:2},
+ {q:"What does AI stand for?",o:["Artificial Intelligence","Automatic Internet","Advanced Input","Audio Interface"],a:0},
+ {q:"Which language is mainly used to style web pages?",o:["HTML","CSS","SQL","Python"],a:1}
+];
+let i=0,score=0,lives=3,coins=Number(localStorage.coins||0),timer;
+document.getElementById("coins").textContent=coins;
+function show(id){document.querySelectorAll(".screen").forEach(x=>x.classList.remove("active"));document.getElementById(id).classList.add("active")}
+function startGame(){i=0;score=0;lives=3;show("game");render()}
+function render(){
+ clearInterval(timer);let x=qs[i];document.getElementById("qnum").textContent=i+1;document.getElementById("score").textContent=score;document.getElementById("lives").textContent=lives;document.getElementById("time").textContent=15;document.getElementById("fill").style.width=(i/qs.length*100)+"%";
+ document.getElementById("question").textContent=x.q;let box=document.getElementById("options");box.innerHTML="";
+ x.o.forEach((v,n)=>{let b=document.createElement("button");b.className="option";b.textContent=String.fromCharCode(65+n)+". "+v;b.onclick=()=>answer(n,b);box.appendChild(b)});
+ let t=15;timer=setInterval(()=>{t--;document.getElementById("time").textContent=t;if(t<=0){clearInterval(timer);answer(-1,null)}},1000)
+}
+function answer(n,b){
+ clearInterval(timer);let x=qs[i];document.querySelectorAll(".option").forEach(z=>z.disabled=true);
+ if(n===x.a){score+=100;b?.classList.add("correct")}else{lives--;b?.classList.add("wrong");document.querySelectorAll(".option")[x.a]?.classList.add("correct")}
+ setTimeout(()=>{if(lives<=0||i===qs.length-1){coins+=Math.floor(score/100);localStorage.coins=coins;document.getElementById("finalScore").textContent=score;document.getElementById("earned").textContent=Math.floor(score/100);document.getElementById("lbscore").textContent=score;document.getElementById("coins").textContent=coins;show("result")}else{i++;render()}},700)
+}
+function hint(){alert("AI Hint: Think about the meaning of the question and eliminate the clearly incorrect options first.")}
+</script>
+</body>
+</html>

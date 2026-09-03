@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>AI Quiz Battle V2</title>
+<style>
+*{box-sizing:border-box} body{margin:0;font-family:system-ui,-apple-system,Segoe UI,sans-serif;background:#070b18;color:#f4f7ff}
+button{font:inherit;border:0;cursor:pointer} .app{max-width:520px;min-height:100vh;margin:auto;padding:18px 16px 28px;background:radial-gradient(circle at 50% 0,#18245a 0,#070b18 42%)}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}.brand{font-weight:800;letter-spacing:.5px}.coins{background:#151d38;border:1px solid #2d3b68;padding:8px 12px;border-radius:999px}
+.screen{display:none}.screen.active{display:block}.hero{text-align:center;padding:28px 8px}.bot{font-size:68px;filter:drop-shadow(0 0 18px #6178ff)}h1{font-size:34px;margin:8px 0}h2{margin:8px 0 16px}.sub{color:#9da8c7;margin-bottom:24px}
+.primary,.secondary,.answer{width:100%;padding:15px;border-radius:14px;margin:7px 0;font-weight:800}.primary{background:linear-gradient(135deg,#6c7cff,#9a5cff);color:white;box-shadow:0 8px 25px #4355b855}.secondary{background:#141b32;color:#dce3ff;border:1px solid #2b365d}
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:18px 0}.card{background:#11182d;border:1px solid #26345e;border-radius:16px;padding:15px}.big{font-size:24px;font-weight:800}.muted{color:#929dbb;font-size:13px}
+.levels{display:grid;grid-template-columns:1fr 1fr;gap:12px}.level{background:#11182d;border:1px solid #29365f;border-radius:17px;padding:17px;text-align:left}.level.locked{opacity:.5}.level b{display:block;margin-bottom:6px}.pill{display:inline-block;padding:4px 8px;border-radius:99px;background:#222d51;color:#aebcff;font-size:12px}
+.qhead{display:flex;justify-content:space-between;align-items:center}.timer{font-size:24px;font-weight:900}.bar{height:7px;background:#1b2440;border-radius:99px;overflow:hidden;margin:14px 0 20px}.fill{height:100%;background:#7d8cff;width:0}.question{font-size:23px;line-height:1.25;font-weight:800;margin:20px 0}.answer{background:#121a31;color:#e9edff;border:1px solid #2b3966;text-align:left}.answer.correct{background:#153d2b;border-color:#42d18b}.answer.wrong{background:#42202b;border-color:#ff667e}.answer:disabled{cursor:default}.hint{font-size:13px;color:#aab4d2;text-align:center;margin:12px 0}
+.result{text-align:center;padding-top:22px}.score{font-size:56px;font-weight:900}.rank{color:#9ea9c9}.lbrow{display:flex;justify-content:space-between;background:#11182d;border:1px solid #26345b;padding:13px;border-radius:13px;margin:8px 0}.note{font-size:12px;color:#7f8aaa;text-align:center;margin-top:18px}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="top"><div class="brand">🤖 AI QUIZ BATTLE <span class="pill">V2</span></div><div class="coins">🪙 <span id="coinTop">0</span></div></div>
+
+  <section id="home" class="screen active">
+    <div class="hero"><div class="bot">🤖</div><h1>AI Quiz Battle</h1><div class="sub">Think fast. Beat your score. Become the Quiz Master.</div>
+      <button class="primary" onclick="startGame()">⚔️ PLAY NOW</button>
+      <button class="secondary" onclick="show('levels')">🎯 SELECT LEVEL</button>
+      <button class="secondary" onclick="show('leaderboard')">🏆 LEADERBOARD</button>
+    </div>
+    <div class="cards"><div class="card"><div class="big" id="bestHome">0</div><div class="muted">Best Score</div></div><div class="card"><div class="big" id="gamesHome">0</div><div class="muted">Games Played</div></div></div>
+  </section>
+
+  <section id="levels" class="screen">
+    <h2>🎯 Choose Difficulty</h2><div class="levels">
+      <button class="level" onclick="setDifficulty('Easy')"><b>🟢 Easy</b><span class="muted">10 questions · 20 sec</span></button>
+      <button class="level" onclick="setDifficulty('Medium')"><b>🟡 Medium</b><span class="muted">10 questions · 15 sec</span></button>
+      <button class="level" onclick="setDifficulty('Hard')"><b>🔴 Hard</b><span class="muted">10 questions · 10 sec</span></button>
+      <div class="level locked"><b>🔒 Expert</b><span class="muted">Unlock by reaching 800 score</span></div>
+    </div><button class="secondary" onclick="show('home')">← Back</button>
+  </section>
+
+  <section id="game" class="screen">
+    <div class="qhead"><b id="difficultyLabel">Easy</b><div class="timer">⏱️ <span id="timer">20</span></div></div>
+    <div class="bar"><div class="fill" id="fill"></div></div>
+    <div class="muted" id="progress">Question 1/10 · ❤️ 3</div>
+    <div class="question" id="question"></div>
+    <div id="answers"></div>
+    <button class="secondary" id="hintBtn" onclick="hint()">💡 Ask AI Hint (−10 coins)</button>
+    <div class="hint" id="hintText"></div>
+  </section>
+
+  <section id="result" class="screen">
+    <div class="result"><div class="bot" style="font-size:55px">🏆</div><h2>Battle Complete!</h2><div class="score" id="finalScore">0</div><div class="rank" id="resultText"></div>
+      <div class="cards"><div class="card"><div class="big" id="earnedCoins">+0</div><div class="muted">Coins Earned</div></div><div class="card"><div class="big" id="bestResult">0</div><div class="muted">Best Score</div></div></div>
+      <button class="primary" onclick="startGame()">🔄 PLAY AGAIN</button><button class="secondary" onclick="show('leaderboard')">🏆 LEADERBOARD</button><button class="secondary" onclick="show('home')">⌂ HOME</button>
+    </div>
+  </section>
+
+  <section id="leaderboard" class="screen">
+    <h2>🏆 Leaderboard</h2><div id="lb"></div><div class="note">Local leaderboard on this device.</div><button class="secondary" onclick="show('home')">← Back</button>
+  </section>
+</div>
+
+<script>
+const banks={
+Easy:[
+["Which planet is known as the Red Planet?","Mars",["Venus","Mars","Jupiter","Mercury"]],
+["How many days are in a week?","7",["5","6","7","8"]],
+["Which animal is called the King of the Jungle?","Lion",["Tiger","Lion","Elephant","Bear"]],
+["What is 5 + 7?","12",["10","11","12","13"]],
+["Which gas do humans need to breathe?","Oxygen",["Oxygen","Helium","Hydrogen","Neon"]],
+["What color do you get by mixing blue and yellow?","Green",["Purple","Green","Orange","Pink"]],
+["How many legs does a spider have?","8",["6","8","10","12"]],
+["Which is the largest ocean?","Pacific Ocean",["Atlantic Ocean","Indian Ocean","Pacific Ocean","Arctic Ocean"]],
+["What is the opposite of hot?","Cold",["Warm","Cold","Dry","Bright"]],
+["Which device is commonly used to take photos?","Camera",["Router","Camera","Printer","Speaker"]]
+],
+Medium:[
+["Which language is mainly used to style web pages?","CSS",["HTML","CSS","SQL","Python"]],
+["What does CPU stand for?","Central Processing Unit",["Central Processing Unit","Computer Power Unit","Core Program Utility","Central Program User"]],
+["Which continent is India in?","Asia",["Europe","Asia","Africa","Australia"]],
+["What is the square root of 144?","12",["10","11","12","14"]],
+["Which planet is closest to the Sun?","Mercury",["Earth","Mercury","Venus","Mars"]],
+["What does URL stand for?","Uniform Resource Locator",["Universal Read Link","Uniform Resource Locator","User Route Link","Unified Resource Line"]],
+["Which organ pumps blood around the body?","Heart",["Lung","Brain","Heart","Kidney"]],
+["Which number is prime?","29",["21","25","27","29"]],
+["Which ocean lies between Africa and Australia?","Indian Ocean",["Pacific Ocean","Atlantic Ocean","Indian Ocean","Arctic Ocean"]],
+["What is the chemical symbol for gold?","Au",["Ag","Au","Gd","Go"]]
+],
+Hard:[
+["Which protocol is primarily used to securely transfer web pages?","HTTPS",["HTTP","HTTPS","FTP","SMTP"]],
+["What is the binary representation of decimal 10?","1010",["1001","1010","1100","1110"]],
+["Which data structure follows LIFO?","Stack",["Queue","Stack","Tree","Graph"]],
+["What is the derivative of x²?","2x",["x","2x","x²","2"]],
+["Which planet has the most prominent ring system?","Saturn",["Jupiter","Saturn","Uranus","Neptune"]],
+["What does API commonly stand for?","Application Programming Interface",["Applied Program Internet","Application Programming Interface","App Process Integration","Automated Program Input"]],
+["Which sorting algorithm has average O(n log n) complexity?","Merge sort",["Bubble sort","Merge sort","Linear search","Selection sort"]],
+["What is the SI unit of electric resistance?","Ohm",["Volt","Watt","Ohm","Ampere"]],
+["Which layer of the OSI model handles routing?","Network",["Transport","Session","Network","Data Link"]],
+["Which HTML element is used for the largest heading?","h1",["h6","head","h1","title"]]
+]};
+let difficulty=localStorage.getItem('difficulty')||'Easy', idx=0, score=0, lives=3, time=20, timerId=null, questions=[], usedHint=false;
+const getNum=k=>Number(localStorage.getItem(k)||0), setNum=(k,v)=>localStorage.setItem(k,v);
+function show(id){document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));document.getElementById(id).classList.add('active'); if(id==='home')updateHome(); if(id==='leaderboard')renderLB();}
+function setDifficulty(d){difficulty=d;localStorage.setItem('difficulty',d);startGame();}
+function updateTop(){document.getElementById('coinTop').textContent=getNum('coins')}
+function updateHome(){document.getElementById('bestHome').textContent=getNum('best');document.getElementById('gamesHome').textContent=getNum('games');updateTop()}
+function startGame(){
+  clearInterval(timerId); questions=[...banks[difficulty]].sort(()=>Math.random()-.5); idx=0;score=0;lives=3;show('game');nextQuestion();
+}
+function nextQuestion(){
+  clearInterval(timerId); usedHint=false; document.getElementById('hintText').textContent='';document.getElementById('hintBtn').disabled=false;
+  if(idx>=questions.length||lives<=0){finish();return}
+  const q=questions[idx], limit=difficulty==='Easy'?20:difficulty==='Medium'?15:10;time=limit;
+  document.getElementById('difficultyLabel').textContent=difficulty;
+  document.getElementById('timer').textContent=time;
+  document.getElementById('progress').textContent=`Question ${idx+1}/${questions.length} · ❤️ ${lives}`;
+  document.getElementById('fill').style.width=(idx/questions.length*100)+'%';
+  document.getElementById('question').textContent=q[0];
+  const answers=document.getElementById('answers');answers.innerHTML='';
+  [...q[2]].sort(()=>Math.random()-.5).forEach(a=>{const b=document.createElement('button');b.className='answer';b.textContent=a;b.onclick=()=>answer(b,a,q[1]);answers.appendChild(b)});
+  timerId=setInterval(()=>{time--;document.getElementById('timer').textContent=time;if(time<=0){clearInterval(timerId);answer(null,null,q[1],true)}},1000);
+}
+function answer(btn,choice,correct,timeout=false){
+  if(timerId===null && idx>=questions.length)return; clearInterval(timerId);
+  document.querySelectorAll('.answer').forEach(b=>b.disabled=true);
+  if(!timeout && choice===correct){btn.classList.add('correct');score+=difficulty==='Easy'?100:difficulty==='Medium'?150:200;}
+  else{if(btn)btn.classList.add('wrong');document.querySelectorAll('.answer').forEach(b=>{if(b.textContent===correct)b.classList.add('correct')});lives--; }
+  setTimeout(()=>{idx++;nextQuestion()},700);
+}
+function hint(){
+  if(usedHint)return;let c=getNum('coins');if(c<10){document.getElementById('hintText').textContent='Need 10 coins for a hint.';return}
+  setNum('coins',c-10);usedHint=true;document.getElementById('hintBtn').disabled=true;
+  const q=questions[idx];document.getElementById('hintText').textContent='🤖 AI Hint: Think about the option that best matches the key concept in the question.';
+  updateTop();
+}
+function finish(){
+  clearInterval(timerId);let best=Math.max(getNum('best'),score), games=getNum('games')+1;
+  setNum('best',best);setNum('games',games);let earned=Math.max(0,Math.floor(score/50)+(lives*10));setNum('coins',getNum('coins')+earned);
+  document.getElementById('finalScore').textContent=score;document.getElementById('earnedCoins').textContent='+'+earned;document.getElementById('bestResult').textContent=best;
+  document.getElementById('resultText').textContent=score>=800?'🔥 Quiz Master level!':score>=500?'⭐ Great battle!':'💪 Keep practicing!';
+  const lb=JSON.parse(localStorage.getItem('lb')||'[]');lb.push({score,difficulty,date:new Date().toLocaleDateString()});lb.sort((a,b)=>b.score-a.score);localStorage.setItem('lb',JSON.stringify(lb.slice(0,10)));updateTop();show('result');
+}
+function renderLB(){
+ const lb=JSON.parse(localStorage.getItem('lb')||'[]'), box=document.getElementById('lb');
+ box.innerHTML=lb.length?lb.map((x,i)=>`<div class="lbrow"><b>#${i+1} ${i===0?'👑':''}</b><span>${x.score} pts · ${x.difficulty}</span></div>`).join(''):'<div class="card">No scores yet. Play your first battle!</div>';
+}
+updateHome();
+</script>
+</body>
+</html>

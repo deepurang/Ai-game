@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>AI Quiz Battle V4</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#060914;color:#f7f8ff;font-family:system-ui,-apple-system,Segoe UI,sans-serif}
+button,input{font:inherit}.app{max-width:560px;min-height:100vh;margin:auto;padding:15px 16px 30px;background:radial-gradient(circle at 50% 0,#1c2a69 0,#060914 46%)}
+button{border:0;cursor:pointer}.top{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:15px}.brand{font-weight:950;letter-spacing:.3px}.stats{display:flex;gap:5px}.chip{background:#141d39;border:1px solid #34436f;border-radius:99px;padding:7px 9px;font-size:13px}
+.screen{display:none}.screen.active{display:block}.hero{text-align:center;padding:18px 5px}.robot{font-size:68px;filter:drop-shadow(0 0 18px #7085ff)}h1{font-size:34px;margin:7px 0}h2{margin:8px 0 15px}.muted{color:#99a5c5;font-size:13px}.primary,.secondary,.topic,.answer{width:100%;padding:14px;border-radius:14px;margin:6px 0;font-weight:850}.primary{color:#fff;background:linear-gradient(135deg,#657aff,#9a55ff);box-shadow:0 8px 25px #4f60e044}.secondary{background:#121a30;color:#e8ebff;border:1px solid #2d3b67}.profile{display:flex;align-items:center;gap:12px;background:#11182d;border:1px solid #2a3965;border-radius:18px;padding:14px;margin:10px 0}.avatar{font-size:43px}.profile input{flex:1;width:100%;background:#080d1d;color:#fff;border:1px solid #36446e;border-radius:10px;padding:10px;outline:none}.cards{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:13px 0}.card{background:#11182d;border:1px solid #29375f;border-radius:16px;padding:14px}.big{font-size:25px;font-weight:950}.topics{display:grid;grid-template-columns:1fr 1fr;gap:10px}.topic{text-align:left;background:#11192f;color:#eef1ff;border:1px solid #2d3b66;padding:16px}.topic small{display:block;color:#97a4c6;margin-top:4px}.daily{background:linear-gradient(135deg,#18234a,#10162c);border:1px solid #485a94;border-radius:18px;padding:16px;margin:12px 0}.done{color:#5ce3a0;font-weight:850}.qhead{display:flex;justify-content:space-between;align-items:center}.timer{font-weight:950;font-size:24px}.bar{height:7px;background:#1a2441;border-radius:99px;overflow:hidden;margin:12px 0 17px}.fill{height:100%;width:0;background:#8290ff}.question{font-size:22px;line-height:1.3;font-weight:900;margin:18px 0}.answer{text-align:left;background:#11192f;color:#edf0ff;border:1px solid #2d3c68}.answer.correct{background:#153d2c;border-color:#48d996}.answer.wrong{background:#44202d;border-color:#ff7187}.hint{text-align:center;color:#aab5d3;font-size:13px;min-height:18px;margin:9px 0}.ach{display:grid;grid-template-columns:1fr 1fr;gap:10px}.badge{background:#11182d;border:1px solid #29365f;border-radius:15px;padding:13px}.badge.locked{opacity:.4}.lbrow{display:flex;justify-content:space-between;background:#11182d;border:1px solid #29365f;border-radius:12px;padding:12px;margin:7px 0}.note{text-align:center;color:#7f8aa9;font-size:12px;margin:14px 0}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="top"><div class="brand">🤖 AI QUIZ BATTLE <span class="muted">V4</span></div><div class="stats"><span class="chip">🔥 <b id="streak">0</b></span><span class="chip">🪙 <b id="coins">0</b></span></div></div>
+
+<section id="home" class="screen active">
+<div class="hero"><div class="robot">🤖</div><h1>AI Quiz Battle</h1><div class="muted">V4 • Topics • Daily Reward • Streaks</div></div>
+<div class="profile"><div class="avatar">👤</div><div style="flex:1"><div class="muted">PLAYER NAME</div><input id="playerName" maxlength="18" placeholder="Enter your name"></div></div>
+<div class="daily"><b>📅 Daily Reward</b><div id="dailyText" class="muted" style="margin:5px 0 10px"></div><button id="dailyBtn" class="primary" onclick="claimDaily()">🎁 CLAIM +50 COINS</button></div>
+<button class="primary" onclick="openTopics()">⚔️ START BATTLE</button>
+<button class="secondary" onclick="show('profile')">👤 PROFILE & ACHIEVEMENTS</button>
+<button class="secondary" onclick="show('leaderboard')">🏆 LEADERBOARD</button>
+<div class="cards"><div class="card"><div class="big" id="best">0</div><div class="muted">Best Score</div></div><div class="card"><div class="big" id="games">0</div><div class="muted">Battles</div></div></div>
+</section>
+
+<section id="topics" class="screen">
+<h2>🎯 Choose a Topic</h2><div class="topics">
+<button class="topic" onclick="startGame('GK')">🌍 General Knowledge<small>Everyday facts</small></button>
+<button class="topic" onclick="startGame('Science')">🔬 Science<small>Space & nature</small></button>
+<button class="topic" onclick="startGame('Technology')">💻 Technology<small>Web & computers</small></button>
+<button class="topic" onclick="startGame('Sports')">🏆 Sports<small>Popular sports</small></button>
+<button class="topic" onclick="startGame('History')">📜 History<small>World history</small></button>
+<button class="topic" onclick="startGame('Mixed')">🎲 Mixed<small>Everything</small></button>
+</div><button class="secondary" onclick="show('home')">← Home</button>
+</section>
+
+<section id="profile" class="screen">
+<h2>👤 Profile</h2><div class="profile"><div class="avatar">🧑‍🚀</div><div><b id="profileName">Player</b><div class="muted">Quiz Warrior</div></div></div>
+<div class="cards"><div class="card"><div class="big" id="pBest">0</div><div class="muted">Best Score</div></div><div class="card"><div class="big" id="pGames">0</div><div class="muted">Battles</div></div></div>
+<h2>🏅 Achievements</h2><div class="ach" id="achievements"></div><button class="secondary" onclick="show('home')">← Home</button>
+</section>
+
+<section id="game" class="screen">
+<div class="qhead"><b id="mode"></b><div class="timer">⏱️ <span id="timer">15</span></div></div>
+<div class="bar"><div class="fill" id="fill"></div></div><div class="muted" id="progress"></div>
+<div class="question" id="question"></div><div id="answers"></div>
+<button class="secondary" id="hintBtn" onclick="hint()">💡 AI Hint (−10 coins)</button><div class="hint" id="hintText"></div>
+</section>
+
+<section id="result" class="screen">
+<div class="hero"><div class="robot" style="font-size:55px">🏆</div><h2 id="resultTitle">Battle Complete!</h2><div class="big" style="font-size:58px" id="finalScore">0</div><div class="muted" id="resultMsg"></div></div>
+<div class="cards"><div class="card"><div class="big" id="earned">+0</div><div class="muted">Coins Earned</div></div><div class="card"><div class="big" id="bestResult">0</div><div class="muted">Best Score</div></div></div>
+<button class="primary" onclick="openTopics()">⚔️ PLAY AGAIN</button><button class="secondary" onclick="show('profile')">🏅 Achievements</button><button class="secondary" onclick="show('home')">⌂ HOME</button>
+</section>
+
+<section id="leaderboard" class="screen"><h2>🏆 Local Leaderboard</h2><div id="lb"></div><div class="note">Your scores are saved on this device.</div><button class="secondary" onclick="show('home')">← Home</button></section>
+</div>
+
+<script>
+const BANK={
+GK:[
+["What is the capital of India?","New Delhi",["Mumbai","New Delhi","Kolkata","Chennai"]],
+["How many days are in a leap year?","366",["365","366","364","360"]],
+["Which is the largest ocean?","Pacific Ocean",["Atlantic Ocean","Indian Ocean","Pacific Ocean","Arctic Ocean"]],
+["How many colors are traditionally in a rainbow?","7",["5","6","7","8"]],
+["Which animal is known for its long trunk?","Elephant",["Giraffe","Elephant","Tiger","Horse"]],
+["Which is the fastest land animal?","Cheetah",["Lion","Cheetah","Horse","Leopard"]]],
+Science:[
+["Which planet is called the Red Planet?","Mars",["Venus","Mars","Jupiter","Mercury"]],
+["What gas do humans need to breathe?","Oxygen",["Carbon dioxide","Oxygen","Helium","Neon"]],
+["What force keeps us on the ground?","Gravity",["Magnetism","Gravity","Friction","Pressure"]],
+["Which organ pumps blood?","Heart",["Brain","Liver","Heart","Lung"]],
+["Water boils at what temperature at sea level?","100°C",["50°C","80°C","100°C","120°C"]],
+["Which star is closest to Earth?","The Sun",["Sirius","The Sun","Polaris","Vega"]]],
+Technology:[
+["Which language is used to style web pages?","CSS",["HTML","CSS","SQL","Python"]],
+["What does CPU stand for?","Central Processing Unit",["Central Processing Unit","Computer Power Unit","Core Program Utility","Central Program User"]],
+["Which device is used to store files?","SSD",["Monitor","SSD","Keyboard","Speaker"]],
+["What does URL stand for?","Uniform Resource Locator",["Universal Read Link","Uniform Resource Locator","User Route Link","Unified Resource Line"]],
+["Which tag makes the largest HTML heading?","h1",["h6","head","h1","title"]],
+["Which protocol secures web traffic?","HTTPS",["HTTP","HTTPS","FTP","SMTP"]]],
+Sports:[
+["How many players are on a football team on the field?","11",["9","10","11","12"]],
+["Which sport uses a bat and ball?","Cricket",["Swimming","Cricket","Boxing","Wrestling"]],
+["How many rings are on the Olympic symbol?","5",["4","5","6","7"]],
+["Which sport is played at Wimbledon?","Tennis",["Football","Tennis","Hockey","Golf"]],
+["How many points is a basketball free throw worth?","1",["1","2","3","4"]],
+["Which sport has a goalkeeper?","Football",["Chess","Football","Badminton","Athletics"]]],
+History:[
+["The Taj Mahal is in which Indian city?","Agra",["Delhi","Agra","Jaipur","Lucknow"]],
+["The ancient pyramids are strongly associated with which country?","Egypt",["Greece","Egypt","Italy","China"]],
+["Who was known as the Iron Man of India?","Sardar Vallabhbhai Patel",["Subhas Chandra Bose","Sardar Vallabhbhai Patel","Bhagat Singh","Jawaharlal Nehru"]],
+["Which civilization built Machu Picchu?","Inca",["Roman","Inca","Maya","Greek"]],
+["The Great Wall is associated with which country?","China",["Japan","China","India","Korea"]],
+["Which city was historically known as Constantinople?","Istanbul",["Rome","Istanbul","Athens","Cairo"]]]
+};
+let topic='Mixed',questions=[],idx=0,score=0,lives=3,timerId=null,time=15,usedHint=false,ending=false;
+const N=k=>Number(localStorage.getItem(k)||0),S=(k,v)=>localStorage.setItem(k,String(v));
+function player(){return document.getElementById('playerName').value.trim()||localStorage.getItem('player')||'Player'}
+function savePlayer(){S('player',player())}
+document.getElementById('playerName').value=localStorage.getItem('player')||'';
+document.getElementById('playerName').addEventListener('change',savePlayer);
+function show(id){clearInterval(timerId);document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');if(id==='home')home();if(id==='profile')profile();if(id==='leaderboard')leaderboard()}
+function home(){document.getElementById('coins').textContent=N('coins');document.getElementById('streak').textContent=N('streak');document.getElementById('best').textContent=N('best');document.getElementById('games').textContent=N('games');let today=new Date().toDateString();let claimed=localStorage.getItem('dailyReward')===today;document.getElementById('dailyText').textContent=claimed?'Reward claimed today. Come back tomorrow!':'Claim your daily reward and start a streak!';let b=document.getElementById('dailyBtn');b.disabled=claimed;b.textContent=claimed?'✅ CLAIMED TODAY':'🎁 CLAIM +50 COINS';b.style.opacity=claimed?.55:1}
+function claimDaily(){let today=new Date().toDateString();if(localStorage.getItem('dailyReward')===today)return;S('coins',N('coins')+50);localStorage.setItem('dailyReward',today);home()}
+function openTopics(){savePlayer();show('topics')}
+function startGame(t){topic=t;questions=(t==='Mixed'?Object.values(BANK).flat():BANK[t]).slice().sort(()=>Math.random()-.5).slice(0,10);idx=0;score=0;lives=3;ending=false;show('game');next()}
+function next(){clearInterval(timerId);if(idx>=questions.length||lives<=0){finish();return}usedHint=false;document.getElementById('hintText').textContent='';document.getElementById('hintBtn').disabled=false;time=15;let q=questions[idx];document.getElementById('mode').textContent='🎯 '+topic;document.getElementById('timer').textContent=time;document.getElementById('progress').textContent=`Question ${idx+1}/10 · ❤️ ${lives}`;document.getElementById('fill').style.width=(idx/10*100)+'%';document.getElementById('question').textContent=q[0];let box=document.getElementById('answers');box.innerHTML='';q[2].slice().sort(()=>Math.random()-.5).forEach(a=>{let b=document.createElement('button');b.className='answer';b.textContent=a;b.onclick=()=>answer(b,a,q[1],false);box.appendChild(b)});timerId=setInterval(()=>{time--;document.getElementById('timer').textContent=time;if(time<=0)answer(null,null,q[1],true)},1000)}
+function answer(btn,choice,correct,timeout){if(ending)return;clearInterval(timerId);document.querySelectorAll('.answer').forEach(b=>b.disabled=true);if(!timeout&&choice===correct){btn.classList.add('correct');score+=100;S('coins',N('coins')+10)}else{if(btn)btn.classList.add('wrong');document.querySelectorAll('.answer').forEach(b=>{if(b.textContent===correct)b.classList.add('correct')});lives--}home();setTimeout(()=>{idx++;next()},650)}
+function hint(){if(usedHint)return;let c=N('coins');if(c<10){document.getElementById('hintText').textContent='You need 10 coins for a hint.';return}S('coins',c-10);usedHint=true;document.getElementById('hintBtn').disabled=true;document.getElementById('hintText').textContent='🤖 AI Hint: eliminate the options that clearly do not match the question.';home()}
+function finish(){if(ending)return;ending=true;clearInterval(timerId);let old=N('best'),best=Math.max(old,score),games=N('games')+1;let earned=20+lives*10;if(topic==='Mixed')earned+=10;S('best',best);S('games',games);S('coins',N('coins')+earned);S('streak',score>=500?N('streak')+1:0);let a=JSON.parse(localStorage.getItem('lb')||'[]');a.push({name:player(),score,topic});a.sort((x,y)=>y.score-x.score);localStorage.setItem('lb',JSON.stringify(a.slice(0,10)));document.getElementById('resultTitle').textContent=topic+' Battle Complete!';document.getElementById('finalScore').textContent=score;document.getElementById('earned').textContent='+'+earned;document.getElementById('bestResult').textContent=best;document.getElementById('resultMsg').textContent=score>=800?'🔥 Quiz Master! Amazing battle.':score>=500?'⭐ Great job! Keep the streak alive.':'💪 Keep practicing and beat your score.';show('result')}
+function profile(){savePlayer();document.getElementById('profileName').textContent=player();document.getElementById('pBest').textContent=N('best');document.getElementById('pGames').textContent=N('games');let today=new Date().toDateString();let a=[['🏅','First Battle',N('games')>=1],['🎯','500 Score',N('best')>=500],['🔥','3 Streak',N('streak')>=3],['💎','1000 Score',N('best')>=1000],['🎁','Daily Reward',localStorage.getItem('dailyReward')===today],['👑','1500 Score',N('best')>=1500]];document.getElementById('achievements').innerHTML=a.map(x=>`<div class="badge ${x[2]?'':'locked'}"><div style="font-size:26px">${x[0]}</div><b>${x[1]}</b><div class="muted">${x[2]?'Unlocked':'Locked'}</div></div>`).join('')}
+function leaderboard(){let a=JSON.parse(localStorage.getItem('lb')||'[]');document.getElementById('lb').innerHTML=a.length?a.map((x,i)=>`<div class="lbrow"><b>#${i+1} ${i===0?'👑':''} ${x.name}</b><span>${x.score} · ${x.topic}</span></div>`).join(''):'<div class="card">No scores yet. Play a battle!</div>'}
+home();
+</script>
+</body>
+</html>

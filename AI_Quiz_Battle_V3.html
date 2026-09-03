@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>AI Quiz Battle V3</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#070b18;color:#f5f7ff;font-family:system-ui,-apple-system,Segoe UI,sans-serif}.app{max-width:540px;min-height:100vh;margin:auto;padding:16px;background:radial-gradient(circle at 50% 0,#1b2862,#070b18 45%)}button{font:inherit;border:0;cursor:pointer}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}.brand{font-weight:900}.coins,.streak{background:#141d38;border:1px solid #30406d;padding:8px 11px;border-radius:99px;margin-left:4px}.screen{display:none}.screen.active{display:block}.hero{text-align:center;padding:20px 6px}.bot{font-size:64px;filter:drop-shadow(0 0 18px #7081ff)}h1{font-size:34px;margin:7px 0}h2{margin:8px 0 16px}.muted{color:#9ba7c7;font-size:13px}.primary,.secondary,.answer{width:100%;padding:14px;border-radius:14px;margin:6px 0;font-weight:800}.primary{color:white;background:linear-gradient(135deg,#687cff,#9b58ff);box-shadow:0 8px 24px #5364d844}.secondary{background:#131b32;color:#e5eaff;border:1px solid #2c3962}.cards{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:15px 0}.card{background:#11192f;border:1px solid #29365e;border-radius:16px;padding:15px}.big{font-size:25px;font-weight:900}.profile{display:flex;gap:13px;align-items:center;background:#11192f;border:1px solid #2b3963;padding:15px;border-radius:18px;margin:12px 0}.avatar{font-size:43px}.profile input{width:100%;background:#0b1022;border:1px solid #35436f;color:white;padding:11px;border-radius:10px}.levels,.achievements{display:grid;grid-template-columns:1fr 1fr;gap:10px}.level,.badge{background:#11192f;border:1px solid #29365e;border-radius:16px;padding:14px;text-align:left}.badge.locked{opacity:.4}.qhead{display:flex;justify-content:space-between}.timer{font-size:23px;font-weight:900}.bar{height:7px;background:#1b2440;border-radius:99px;overflow:hidden;margin:12px 0 18px}.fill{height:100%;background:#7c8cff;width:0}.question{font-size:22px;font-weight:850;line-height:1.3;margin:18px 0}.answer{text-align:left;background:#121a31;color:#e9edff;border:1px solid #2d3b68}.answer.correct{background:#153b2b;border-color:#42d18b}.answer.wrong{background:#42202c;border-color:#ff657d}.hint{text-align:center;color:#aeb8d4;font-size:13px;margin:10px 0}.challenge{background:linear-gradient(135deg,#171f43,#12182e);border:1px solid #43538b;border-radius:18px;padding:17px;margin:14px 0}.complete{color:#62e4a4;font-weight:800}.lbrow{display:flex;justify-content:space-between;background:#11192f;border:1px solid #29365e;padding:13px;border-radius:12px;margin:7px 0}.note{text-align:center;color:#7f8aaa;font-size:12px;margin-top:14px}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="top"><div class="brand">🤖 AI QUIZ <span class="muted">V3</span></div><div><span class="streak">🔥 <b id="streakTop">0</b></span><span class="coins">🪙 <b id="coinTop">0</b></span></div></div>
+
+<section id="home" class="screen active">
+<div class="hero"><div class="bot">🤖</div><h1>AI Quiz Battle</h1><div class="muted">V3 — Profile • Daily Challenge • Achievements</div></div>
+<div class="profile"><div class="avatar">👤</div><div style="flex:1"><div class="muted">PLAYER</div><input id="nameInput" maxlength="18" placeholder="Enter your name"></div></div>
+<button class="primary" onclick="startGame()">⚔️ PLAY BATTLE</button>
+<button class="secondary" onclick="daily()">📅 DAILY CHALLENGE</button>
+<button class="secondary" onclick="show('profile')">👤 PROFILE & ACHIEVEMENTS</button>
+<button class="secondary" onclick="show('leaderboard')">🏆 LEADERBOARD</button>
+<div class="cards"><div class="card"><div class="big" id="best">0</div><div class="muted">Best Score</div></div><div class="card"><div class="big" id="games">0</div><div class="muted">Games Played</div></div></div>
+</section>
+
+<section id="profile" class="screen">
+<h2>👤 My Profile</h2><div class="profile"><div class="avatar">🧑‍🚀</div><div><b id="profileName">Player</b><div class="muted">Quiz Warrior</div></div></div>
+<div class="cards"><div class="card"><div class="big" id="pBest">0</div><div class="muted">Best Score</div></div><div class="card"><div class="big" id="pGames">0</div><div class="muted">Battles</div></div></div>
+<h2>🏅 Achievements</h2><div class="achievements" id="achievements"></div>
+<button class="secondary" onclick="show('home')">← Home</button>
+</section>
+
+<section id="game" class="screen">
+<div class="qhead"><b id="modeLabel">Normal Battle</b><div class="timer">⏱️ <span id="timer">20</span></div></div>
+<div class="bar"><div class="fill" id="fill"></div></div>
+<div class="muted" id="progress"></div><div class="question" id="question"></div><div id="answers"></div>
+<button class="secondary" id="hintBtn" onclick="hint()">💡 AI Hint (−10 coins)</button><div class="hint" id="hintText"></div>
+</section>
+
+<section id="result" class="screen">
+<div class="hero"><div class="bot">🏆</div><h2 id="resultTitle">Battle Complete!</h2><div class="big" style="font-size:55px" id="finalScore">0</div><div class="muted" id="resultMsg"></div></div>
+<div class="cards"><div class="card"><div class="big" id="earned">+0</div><div class="muted">Coins</div></div><div class="card"><div class="big" id="newBest">0</div><div class="muted">Best Score</div></div></div>
+<button class="primary" onclick="startGame()">🔄 PLAY AGAIN</button><button class="secondary" onclick="show('profile')">🏅 View Achievements</button><button class="secondary" onclick="show('home')">⌂ HOME</button>
+</section>
+
+<section id="leaderboard" class="screen"><h2>🏆 Leaderboard</h2><div id="lb"></div><div class="note">Scores are saved locally on this device.</div><button class="secondary" onclick="show('home')">← Home</button></section>
+</div>
+
+<script>
+const qs=[
+["Which planet is known as the Red Planet?","Mars",["Venus","Mars","Jupiter","Mercury"]],
+["How many days are in a week?","7",["5","6","7","8"]],
+["What is 12 × 8?","96",["86","92","96","108"]],
+["Which language styles web pages?","CSS",["HTML","CSS","SQL","JSON"]],
+["What does CPU stand for?","Central Processing Unit",["Central Processing Unit","Computer Power Unit","Core Program Utility","Central Program User"]],
+["Which is the largest ocean?","Pacific Ocean",["Atlantic Ocean","Indian Ocean","Pacific Ocean","Arctic Ocean"]],
+["What is the square root of 144?","12",["10","11","12","14"]],
+["Which organ pumps blood?","Heart",["Lung","Brain","Heart","Kidney"]],
+["What is binary for decimal 10?","1010",["1001","1010","1100","1110"]],
+["Which structure follows LIFO?","Stack",["Queue","Stack","Tree","Graph"]],
+["What is the derivative of x²?","2x",["x","2x","x²","2"]],
+["What does API commonly stand for?","Application Programming Interface",["Applied Program Internet","Application Programming Interface","App Process Integration","Automated Program Input"]],
+["Which HTML tag creates the largest heading?","h1",["h6","head","h1","title"]],
+["Which SI unit measures resistance?","Ohm",["Volt","Watt","Ohm","Ampere"]],
+["Which protocol secures web traffic?","HTTPS",["HTTP","HTTPS","FTP","SMTP"]]
+];
+let idx=0,score=0,lives=3,time=20,timerId=null,questions=[],dailyMode=false,usedHint=false;
+const n=k=>Number(localStorage.getItem(k)||0), set=(k,v)=>localStorage.setItem(k,v);
+function name(){return document.getElementById('nameInput').value.trim()||localStorage.getItem('player')||'Player'}
+function saveName(){localStorage.setItem('player',name())}
+document.getElementById('nameInput').value=localStorage.getItem('player')||'';
+document.getElementById('nameInput').addEventListener('change',saveName);
+function show(id){clearInterval(timerId);document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');if(id==='home')home();if(id==='profile')profile();if(id==='leaderboard')lb()}
+function home(){document.getElementById('coinTop').textContent=n('coins');document.getElementById('streakTop').textContent=n('streak');document.getElementById('best').textContent=n('best');document.getElementById('games').textContent=n('games');}
+function profile(){saveName();document.getElementById('profileName').textContent=name();document.getElementById('pBest').textContent=n('best');document.getElementById('pGames').textContent=n('games');let a=[
+['🏅','First Battle',n('games')>=1],['🎯','Score 500+',n('best')>=500],['🔥','3 Win Streak',n('streak')>=3],['💎','Score 1000+',n('best')>=1000],['📅','Daily Player',localStorage.getItem('daily')===new Date().toDateString()],['👑','Quiz Master',n('best')>=1500]];
+document.getElementById('achievements').innerHTML=a.map(x=>`<div class="badge ${x[2]?'':'locked'}"><div style="font-size:27px">${x[0]}</div><b>${x[1]}</b><div class="muted">${x[2]?'Unlocked':'Locked'}</div></div>`).join('')}
+function startGame(isDaily=false){saveName();dailyMode=isDaily;idx=0;score=0;lives=3;usedHint=false;questions=[...qs].sort(()=>Math.random()-.5).slice(0,10);show('game');next()}
+function daily(){let today=new Date().toDateString();if(localStorage.getItem('daily')===today){alert('Daily Challenge already completed today! Come back tomorrow.');return}startGame(true)}
+function next(){clearInterval(timerId);if(idx>=questions.length||lives<=0){finish();return}usedHint=false;document.getElementById('hintText').textContent='';document.getElementById('hintBtn').disabled=false;let limit=dailyMode?15:20;time=limit;let q=questions[idx];document.getElementById('modeLabel').textContent=dailyMode?'📅 Daily Challenge':'⚔️ Normal Battle';document.getElementById('timer').textContent=time;document.getElementById('progress').textContent=`Question ${idx+1}/10 · ❤️ ${lives}`;document.getElementById('fill').style.width=(idx/10*100)+'%';document.getElementById('question').textContent=q[0];let box=document.getElementById('answers');box.innerHTML='';[...q[2]].sort(()=>Math.random()-.5).forEach(a=>{let b=document.createElement('button');b.className='answer';b.textContent=a;b.onclick=()=>answer(b,a,q[1],false);box.appendChild(b)});timerId=setInterval(()=>{time--;document.getElementById('timer').textContent=time;if(time<=0)answer(null,null,q[1],true)},1000)}
+function answer(btn,choice,correct,timeout){clearInterval(timerId);document.querySelectorAll('.answer').forEach(b=>b.disabled=true);if(!timeout&&choice===correct){btn.classList.add('correct');score+=dailyMode?150:100}else{if(btn)btn.classList.add('wrong');document.querySelectorAll('.answer').forEach(b=>{if(b.textContent===correct)b.classList.add('correct')});lives--}setTimeout(()=>{idx++;next()},600)}
+function hint(){if(usedHint)return;let c=n('coins');if(c<10){document.getElementById('hintText').textContent='You need 10 coins.';return}set('coins',c-10);usedHint=true;document.getElementById('hintBtn').disabled=true;document.getElementById('hintText').textContent='🤖 AI Hint: Read the question carefully and eliminate the options that clearly do not fit.';home()}
+function finish(){let oldBest=n('best'),best=Math.max(oldBest,score),games=n('games')+1,earned=Math.floor(score/50)+lives*10+(dailyMode?30:0);set('best',best);set('games',games);set('coins',n('coins')+earned);if(score>=500)set('streak',n('streak')+1);else set('streak',0);if(dailyMode)localStorage.setItem('daily',new Date().toDateString());let arr=JSON.parse(localStorage.getItem('lb')||'[]');arr.push({name:name(),score,date:new Date().toLocaleDateString()});arr.sort((a,b)=>b.score-a.score);localStorage.setItem('lb',JSON.stringify(arr.slice(0,10)));document.getElementById('finalScore').textContent=score;document.getElementById('earned').textContent='+'+earned;document.getElementById('newBest').textContent=best;document.getElementById('resultTitle').textContent=dailyMode?'📅 Daily Challenge Complete!':'🏆 Battle Complete!';document.getElementById('resultMsg').textContent=score>=800?'🔥 Excellent! You are becoming a Quiz Master.':score>=500?'⭐ Great job! Keep your streak alive.':'💪 Practice more and beat your score.';show('result')}
+function lb(){let a=JSON.parse(localStorage.getItem('lb')||'[]');document.getElementById('lb').innerHTML=a.length?a.map((x,i)=>`<div class="lbrow"><b>#${i+1} ${i===0?'👑':''} ${x.name}</b><span>${x.score} pts</span></div>`).join(''):'<div class="card">No scores yet. Start a battle!</div>'}
+home();
+</script>
+</body>
+</html>
