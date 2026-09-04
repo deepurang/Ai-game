@@ -1,9 +1,37 @@
-AI_Quiz_Battle_V5_APK_Ready/README.txt
-AI_Quiz_Battle_V5_APK_Ready/settings.gradle
-AI_Quiz_Battle_V5_APK_Ready/gradle.properties
-AI_Quiz_Battle_V5_APK_Ready/build.gradle
-AI_Quiz_Battle_V5_APK_Ready/app/build.gradle
-AI_Quiz_Battle_V5_APK_Ready/app/src/main/AndroidManifest.xml
-AI_Quiz_Battle_V5_APK_Ready/app/src/main/assets/index.html
-AI_Quiz_Battle_V5_APK_Ready/app/src/main/java/com/aiquizbattle/MainActivity.java
-AI_Quiz_Battle_V5_APK_Ready/app/src/main/res/values/styles.xml
+name: Build AI Quiz Battle APK
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Extract Android project
+        run: |
+          unzip -q AI_Quiz_Battle_V5_APK_Ready.zip
+          cd AI_Quiz_Battle_V5_APK_Ready
+          chmod +x gradlew
+
+      - name: Build APK
+        run: |
+          cd AI_Quiz_Battle_V5_APK_Ready
+          ./gradlew assembleDebug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: AI-Quiz-Battle-APK
+          path: AI_Quiz_Battle_V5_APK_Ready/app/build/outputs/apk/debug/*.apk
