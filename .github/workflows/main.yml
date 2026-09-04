@@ -19,16 +19,18 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: Extract Android project
+      - name: Extract project
         run: |
           unzip -q AI_Quiz_Battle_V5_APK_Ready.zip
-          cd AI_Quiz_Battle_V5_APK_Ready
-          chmod +x gradlew
+          find AI_Quiz_Battle_V5_APK_Ready -maxdepth 3 -type f
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
 
       - name: Build APK
         run: |
           cd AI_Quiz_Battle_V5_APK_Ready
-          ./gradlew assembleDebug
+          gradle assembleDebug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
