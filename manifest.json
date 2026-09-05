@@ -1,0 +1,10 @@
+{
+  "name": "AI Quiz Battle",
+  "short_name": "Quiz Battle",
+  "id": "ai-quiz-battle",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#090B22",
+  "theme_color": "#7C5CFF",
+  "description": "AI Quiz Battle is a fun quiz game with multiple topics, smart questions, score, coins, hints and a 10-question battle."
+}
