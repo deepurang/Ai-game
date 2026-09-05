@@ -1,4 +1,11 @@
-{
+,
+"icons": [
+  {
+    "src": "ai_quiz_battle_icon_512.png",
+    "sizes": "512x512",
+    "type": "image/png"
+  }
+]{
   "name": "AI Quiz Battle",
   "short_name": "Quiz Battle",
   "id": "ai-quiz-battle",
